@@ -14,13 +14,14 @@ const userSchema = new Schema<IuserSchema>({
         required:[true,"Email is required"],
         lowercase:true,
         unique:[true,"Email already exists"],
-        matcher:['/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/',"Email is not valid"]
+        match:[/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,"Email is not valid"]
       },
       password:{
         type:String,
         required:[true,"Password is required"],
         minLength:6,
-        maxLength:15
+        maxLength:15,
+        select:false
       },
       avatarURL:{
         type:String
@@ -29,9 +30,9 @@ const userSchema = new Schema<IuserSchema>({
         type:String
       },
       mobileNumber:{
-        type:Number,
+        type:String,
         required:[true,"Mobile number is required"],
-        length:10
+        match:[/^[0-9]{10}$/,"Mobile number must be 10 digits"],
       },
       address:{
         pincode:{
@@ -56,10 +57,10 @@ const userSchema = new Schema<IuserSchema>({
       },
 },{timestamps:true})
 
-userSchema.pre("save",async function(){
+userSchema.pre<IuserSchema>("save",async function(){
     if(!this.isModified("password")) return;
     const salt = await bcrypt.genSalt(10)
-    this.password = await bcrypt.hash(this.password,salt)
+    this.password = await bcrypt.hash(this.password as string, salt)
 })
 
 userSchema.methods.generateAccessToken=function(){
@@ -73,7 +74,7 @@ userSchema.methods.generateAccessToken=function(){
 
 userSchema.methods.generateRefreshToken = function(){
    const refreshToken = jwt.sign(
-              {_id:this._idl},
+              {_id:this._id},
               config.REFRESH_TOKEN_SECRET as string,
               {expiresIn:config.REFRESH_TOKEN_EXPIRY as StringValue}
             )

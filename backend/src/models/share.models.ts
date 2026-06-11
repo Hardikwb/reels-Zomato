@@ -9,10 +9,21 @@ const shareSchema = new Schema<IshareSchema>({
     },
     videoId:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:"vidoes",
-        required:true
-    }
+        ref:"videos",
+    },
+    commentId:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"comments",
+    },
 },{timestamps:true})
+
+shareSchema.pre("validate", function(){
+    const hasVideo = Boolean(this.videoId)
+    const hasComment = Boolean(this.commentId)
+    if(hasVideo === hasComment){
+        throw new Error("Share must reference either a video or a comment")
+    }
+})
 
 const shareModel = mongoose.model("shares",shareSchema)
 export default shareModel

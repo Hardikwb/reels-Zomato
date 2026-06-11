@@ -15,13 +15,14 @@ const restaurentSchema = new Schema<IrestaurentSchema>({
         required:[true,"Email is required"],
         lowercase:true,
         unique:[true,"Email already exists"],
-        matcher:['/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/',"Email is not valid"]
+        match:[/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,"Email is not valid"]
       },
       password:{
         type:String,
         required:[true,"Password is required"],
         minLength:6,
-        maxLength:10
+        maxLength:10,
+        select:false
       },
       avatarURL:{
         type:String
@@ -30,9 +31,9 @@ const restaurentSchema = new Schema<IrestaurentSchema>({
         type:String
       },
       mobileNumber:{
-        type:Number,
+        type:String,
         required:[true,"Mobile number is required"],
-        length:10
+        match:[/^[0-9]{10}$/,"Mobile number must be 10 digits"]
       },
       address:{
         pincode:{
@@ -58,7 +59,7 @@ const restaurentSchema = new Schema<IrestaurentSchema>({
 },{timestamps:true})
 
 
-restaurentSchema.pre("save",async function(){
+restaurentSchema.pre<IrestaurentSchema>("save",async function(){
     if(!this.isModified("password")) return;
     const salt = await bcrypt.genSalt(10)
     this.password = await bcrypt.hash(this.password,salt)
@@ -75,7 +76,7 @@ restaurentSchema.methods.generateAccessToken=function(){
 
 restaurentSchema.methods.generateRefreshToken = function(){
    const refreshToken = jwt.sign(
-              {_id:this._idl},
+              {_id:this._id},
               config.REFRESH_TOKEN_SECRET as string,
               {expiresIn:config.REFRESH_TOKEN_EXPIRY as StringValue}
             )
@@ -86,6 +87,6 @@ restaurentSchema.methods.isValidPassword = async function(password:string){
    return await bcrypt.compare(password,this.password)
 }
 
-const restaurentModel =  mongoose.model("users",restaurentSchema)
+const restaurentModel =  mongoose.model("restaurents",restaurentSchema)
 
 export default restaurentModel

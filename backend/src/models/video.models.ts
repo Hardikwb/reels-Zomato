@@ -12,9 +12,11 @@ const videoSchema = new Schema<IvideoSchema>({
       },
     restaurent:{
         type:mongoose.Schema.Types.ObjectId,
+        ref:"restaurents",
         required:true,
     },
       
 },{timestamps:true})
 
 const videoModel = mongoose.model("videos",videoSchema)
+export default videoModel

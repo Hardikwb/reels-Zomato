@@ -10,16 +10,12 @@ const commentSchema = new Schema<IcommentSchema>({
     },
     videoId:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:"vidoes",
+        ref:"videos",
+    },
+    userId:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"users",
         required:true
-    },
-    likeId:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"likes"
-    },
-    shareId:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"shares"
     },
     parentCommentId: { 
         type: mongoose.Schema.Types.ObjectId, 
