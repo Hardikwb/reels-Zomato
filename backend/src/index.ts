@@ -4,6 +4,8 @@ import connectDB from "./db/db.js"
 import userRouter from "./routes/user.route.js"
 import cookieParser from "cookie-parser"
 import cors from "cors"
+import commentRouter from "./routes/comment.route.js"
+import likeRouter from "./routes/like.route.js"
 connectDB()
 
 const app = express()
@@ -15,7 +17,10 @@ app.use(cookieParser())
 //     origin:'*',
 //     credentials:true,
 // }))
+
 app.use("/api/user",userRouter)
+app.use("/api/comment",commentRouter)
+app.use("/api/like",likeRouter)
 
 
 app.listen(PORT,()=>{
